@@ -1,0 +1,527 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract Interaction</title>
+
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body class="container">
+
+    <h1 class="mt-5 mb-4">Smart Contract Interaction</h1>
+
+    <!-- Get Supplier Count and Supplies -->
+    <div class="mb-4">
+       
+
+        <div id="packageInfoContainer" class="mt-3"></div>
+        <div id="suppliesContainer" class="mt-3"></div>
+    </div>
+
+    <!-- Insert Data Form -->
+    <h2>Insert Data</h2>
+    <form onsubmit="postPackage(event)">
+        <div class="form-group">
+            <label for="manufacturerIdInput">Manufacturer ID:</label>
+            <input type="number" class="form-control" id="manufacturerIdInput" required>
+        </div>
+        <div class="form-group">
+            <label for="getPackageIdSelect">Select Package ID:</label>
+            <select class="form-control" id="supplyDropdown" required></select>
+        </div>
+        <div class="form-group">
+            <label for="packageIdInput">Package ID:</label>
+            <input type="text" class="form-control" id="packageIdInput" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Post Package</button>
+    </form>
+
+    <!-- Fetch Data Form -->
+    <hr class="mt-4">
+    <h2>Fetch Data</h2>
+    <form onsubmit="getPackage(event)">
+        <div class="form-group">
+            <label for="getPackageIdInput">Package ID:</label>
+            <input type="text" class="form-control" id="getPackageIdInput" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Get Package</button>
+    </form>
+
+    <!-- Fetch Package by Index Form -->
+    <hr class="mt-4">
+    <h2>Fetch Package by Index</h2>
+    <form onsubmit="getPackageByIndex(event)">
+        <div class="form-group">
+            <label for="packageIndexInput">Package Index:</label>
+            <input type="number" class="form-control" id="packageIndexInput" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Get Package by Index</button>
+    </form>
+
+    <!-- Fetch Package Indices by Manufacturer ID Form -->
+    <hr class="mt-4">
+    <h2>Fetch Package Indices by Manufacturer ID</h2>
+    <form onsubmit="getPackageIndicesByManufacturerId(event)">
+        <div class="form-group">
+            <label for="packageIndicesManufacturerIdInput">Manufacturer ID:</label>
+            <input type="number" class="form-control" id="packageIndicesManufacturerIdInput" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Get Package Indices</button>
+    </form>
+
+    <!-- Get Total Manufactured Packages Count -->
+    <hr class="mt-4">
+    <h2>Get Total Manufactured Packages Count</h2>
+    <button class="btn btn-primary" onclick="getManufacturedPackagesCount()">Get Total Packages Count</button>
+
+    <!-- Get Supplier Count -->
+    <hr class="mt-4">
+    
+
+    <!-- Add Supplier Form -->
+    <form id="addMan" class="mt-3">
+        <div class="form-group">
+            <label for="addr">Address:</label>
+            <input type="text" class="form-control" id="addr" placeholder="Address">
+        </div>
+        <div class="form-group">
+            <label for="manuf_name">Manufactured:</label>
+            <input type="text" class="form-control" id="manuf_name" placeholder="Manufactured">
+        </div>
+        <div class="form-group">
+            <label for="ceo">CEO Name:</label>
+            <input type="text" class="form-control" id="ceo" placeholder="CEO Name">
+        </div>
+        <button type="button" class="btn btn-success" onclick="addMan()">Add Supplier to Database</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    
+</body>
+</html>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+ 
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const web3 = new Web3('http://127.0.0.1:7545');
+
+
+
+    
+    const postManufacturedContractAddress = '0x578aD209108f5ee12F88a6a102c5A94F3Dcd6174';
+    const postManufacturedContractAbi = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PackagePosted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "postManufacturedPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getManufacturedPackagesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "getPackageByPackageId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackageIndicesByManufacturerId",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "manufacturedPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manufacturer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+    const postManufacturedContract = new web3.eth.Contract(postManufacturedContractAbi, postManufacturedContractAddress);
+
+    
+
+    window.postPackage = async (event) => {
+        event.preventDefault();
+        
+        const sinfo= document.getElementById('supplyDropdown').value ;
+		const y="-";
+        const manufacturerId = document.getElementById('manufacturerIdInput').value;
+        const packageId = sinfo + y +document.getElementById('packageIdInput').value;
+        const accounts = await web3.eth.getAccounts();
+        await postManufacturedContract.methods.postManufacturedPackage(manufacturerId, packageId)
+            .send({ from: accounts[0], gas: 200000 });
+        console.log('Package posted successfully.');
+    };
+
+    
+
+
+
+
+    window.getPackage = async (event) => {
+        event.preventDefault();
+        const packageId = document.getElementById('getPackageIdInput').value;
+        try {
+            const result = await postManufacturedContract.methods.getPackageByPackageId(packageId).call();
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `
+                <h3>Package Information</h3>
+                <p><strong>Manufacturer ID:</strong> ${result[0]}</p>
+                <p><strong>Package ID:</strong> ${result[1]}</p>
+                <p><strong>Timestamp:</strong> ${new Date(result[2] * 1000).toLocaleString()}</p>
+            `;
+        } catch (error) {
+            console.error('Error fetching package:', error.message);
+        }
+    };
+
+    window.getPackageIndicesByManufacturerId = async (event) => {
+        event.preventDefault();
+        const manufacturerId = document.getElementById('packageIndicesManufacturerIdInput').value;
+        try {
+            const packageIndices = await postManufacturedContract.methods.getPackageIndicesByManufacturerId(manufacturerId).call();
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `<h3>Package Indices</h3>`;
+            packageInfoContainer.innerHTML += `<p><strong>Indices:</strong> ${packageIndices.join(', ')}</p>`;
+        } catch (error) {
+            console.error('Error fetching package indices:', error.message);
+        }
+    };
+
+    window.getPackageByIndex = async (event) => {
+        event.preventDefault();
+        const packageIndex = document.getElementById('packageIndexInput').value;
+        try {
+            const result = await postManufacturedContract.methods.manufacturedPackages(packageIndex).call();
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `
+                <h3>Package Information (Index: ${packageIndex})</h3>
+                <p><strong>Manufacturer ID:</strong> ${result[0]}</p>
+                <p><strong>Package ID:</strong> ${result[1]}</p>
+                <p><strong>Timestamp:</strong> ${new Date(result[2] * 1000).toLocaleString()}</p>
+            `;
+        } catch (error) {
+            console.error('Error fetching package by index:', error.message);
+        }
+    };
+
+    window.getManufacturedPackagesCount = async () => {
+        try {
+            const count = await postManufacturedContract.methods.getManufacturedPackagesCount().call();
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `<h3>Total Manufactured Packages Count</h3>`;
+            packageInfoContainer.innerHTML += `<p><strong>Count:</strong> ${count}</p>`;
+        } catch (error) {
+            console.error('Error fetching total count:', error.message);
+        }
+    };
+
+    
+});
+
+
+
+        async function fetchSupplies() {
+            if (typeof window.ethereum !== 'undefined') {
+            window.web3 = new Web3(ethereum);
+            ethereum.enable(); // Request user permission
+        } else {
+            console.error('MetaMask not installed');
+        }
+            const web3 = window.web3;
+            const contractAddress = '0x21520A63315E3Dc94175793b45b0A20f3c025265';
+        const contractABI =[
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplier_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packages",
+				"type": "string[]"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "findSupplierByPackage",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSupplies",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSuppliesById",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "suppliers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "supplier_id",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            try {
+                const result = await contract.methods.getAllSupplies().call();
+                const allSupplies = result[1];
+
+                const supplyDropdown = document.getElementById('supplyDropdown');
+
+                // Clear existing options
+                supplyDropdown.innerHTML = '';
+
+                // Add options from the supplies array
+                allSupplies.forEach(supply => {
+                    const option = document.createElement('option');
+                    option.value = supply;
+                    option.text = supply;
+                    supplyDropdown.add(option);
+                });
+
+                console.log(allSupplies);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchSupplies() ;
+</script>

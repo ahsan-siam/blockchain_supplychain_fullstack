@@ -1,0 +1,23 @@
+<!-- This page will not have a visible content, as it's intended to be used for processing the request and returning data -->
+
+<script>
+    // Function to extract URL parameters
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    // Get the input parameter from the URL
+    const inputFromURL = getParameterByName('input');
+
+    // Perform some processing with the input (you can customize this)
+    const processedData = 'Processed Data: ' + inputFromURL;
+
+    // Return the processed data as a response
+    document.write(processedData);
+</script>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package Tracker</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Package Tracker</h1>
+
+        <!-- Add Package Section -->
+        <div class="mb-4">
+            <h2>Add Package</h2>
+            <div class="mb-3">
+				
+                <label for="wholesalerName" class="form-label">Wholesaler Name:</label>
+                <input type="text" class="form-control" id="wholesalerName">
+            </div>
+			
+            <div class="mb-3">
+				<div>
+				<h2>Manufactured Packages</h2>
+				<button class="btn btn-primary" onclick="fetchManufacturedPackages()">Fetch Manufactured Packages</button>
+				<p id="manufacturedPackages" class="mt-3"></p>
+			</div>
+				<select id="packageDropdown" name="packageDropdown">
+					
+				</select><br>
+                <label for="packageNames" class="form-label">Package Names (comma separated):</label>
+                <input type="text" class="form-control" id="packageNames">
+            </div>
+            <button class="btn btn-primary" onclick="addPackage()">Add Package</button>
+        </div>
+
+        <!-- Package Details Section -->
+        <div class="mb-4">
+            <h2>Package Details</h2>
+            <div class="mb-3">
+                <label for="packageIndex" class="form-label">Package Index:</label>
+                <input type="number" class="form-control" id="packageIndex">
+            </div>
+            <button class="btn btn-primary" onclick="getPackage()">Get Package</button>
+        </div>
+
+        <!-- Search Packages by Wholesaler Section -->
+        <div class="mb-4">
+            <h2>Search Packages by Wholesaler Name</h2>
+            <div class="mb-3">
+                <label for="searchWholesaler" class="form-label">Wholesaler Name:</label>
+                <input type="text" class="form-control" id="searchWholesaler">
+            </div>
+            <button class="btn btn-primary" onclick="findPackagesByWholesaler()">Search</button>
+            <p id="packagesByWholesaler" class="mt-3"></p>
+        </div>
+
+        <!-- Search Wholesaler by Package Name Section -->
+        <div class="mb-4">
+            <h2>Search Wholesaler by Package Name</h2>
+            <div class="mb-3">
+                <label for="searchPackage" class="form-label">Package Name:</label>
+                <input type="text" class="form-control" id="searchPackage">
+            </div>
+            <button class="btn btn-primary" onclick="findWholesalerByPackage()">Search</button>
+            <p id="wholesalerByPackage" class="mt-3"></p>
+        </div>
+
+        <!-- Total Packages Section -->
+        <div class="mb-4">
+            <h2>Total Packages</h2>
+            <button class="btn btn-primary" onclick="countPackages()">Count Packages</button>
+            <p id="totalPackages" class="mt-3"></p>
+        </div>
+
+        <!-- Fetch Manufactured Packages Section -->
+        <div class="mb-4">
+            <h2>Manufactured Packages</h2>
+            <button class="btn btn-primary" onclick="fetchManufacturedPackages()">Fetch Manufactured Packages</button>
+            <p id="manufacturedPackages" class="mt-3"></p>
+        </div>
+    </div>
+
+
+<script>
+    // Connect to the Ethereum node
+    const web3 = new Web3(Web3.givenProvider);
+
+    // Replace with your smart contract address and ABI
+    const contractAddress = '0xf041a572729C93068543B9f5FDD217014f005d8B';
+    const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_wholesalerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packageNames",
+				"type": "string[]"
+			}
+		],
+		"name": "addPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "countPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_wholesalerName",
+				"type": "string"
+			}
+		],
+		"name": "findPackagesByWholesaler",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageName",
+				"type": "string"
+			}
+		],
+		"name": "findWholesalerByPackage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "packages",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "wholesalerName",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+    function addPackage() {
+		const additional = document.getElementById('packageDropdown').value;
+        const wholesalerName = document.getElementById('wholesalerName').value;
+		
+        const packageNames = document.getElementById('packageNames').value.split(',');
+		for(let i=0;i<packageNames.length;i++){
+			packageNames[i]=additional+"-"+packageNames[i];
+		}
+        contract.methods.addPackage(wholesalerName, packageNames)
+            .send({ from: web3.currentProvider.selectedAddress })
+            .then(() => alert('Package added successfully'))
+            .catch(error => console.error(error));
+    }
+
+    function getPackage() {
+        const index = document.getElementById('packageIndex').value;
+
+        contract.methods.getPackage(index)
+            .call()
+            .then(result => console.log(result))
+            .catch(error => console.error(error));
+    }
+
+    function findPackagesByWholesaler() {
+        const wholesalerName = document.getElementById('searchWholesaler').value;
+
+        contract.methods.findPackagesByWholesaler(wholesalerName)
+            .call()
+            .then(result => {
+                document.getElementById('packagesByWholesaler').innerText = result.join(', ');
+            })
+            .catch(error => console.error(error));
+    }
+
+    function findWholesalerByPackage() {
+        const packageName = document.getElementById('searchPackage').value;
+
+        contract.methods.findWholesalerByPackage(packageName)
+            .call()
+            .then(result => {
+                document.getElementById('wholesalerByPackage').innerText = result;
+            })
+            .catch(error => console.error(error));
+    }
+
+    function countPackages() {
+        contract.methods.countPackages()
+            .call()
+            .then(result => {
+                document.getElementById('totalPackages').innerText = result;
+            })
+          
+			.catch(error => console.error(error));
+    }
+
+	  // ... your existing code ...
+
+    // Replace with the address and ABI of your PostManufactured smart contract
+   
+
+    async function fetchManufacturedPackages() {
+		const postManufacturedAddress = '0x5D9d9874EFBBbBb5F77c6171bF01A35a72EF2d4a';
+    const postManufacturedABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PackagePosted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "postManufacturedPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getManufacturedPackagesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "getPackageByPackageId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackageIndicesByManufacturerId",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "manufacturedPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manufacturer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    const postManufacturedContract = new web3.eth.Contract(postManufacturedABI, postManufacturedAddress);
+        try {
+            // Call the method from your PostManufactured smart contract to get the total number of packages
+            const totalPackages = await postManufacturedContract.methods.getManufacturedPackagesCount().call();
+
+            // Fetch details for each package
+            const packages = [];
+            for (let i = totalPackages-10; i < totalPackages; i++) {
+                const result = await postManufacturedContract.methods.manufacturedPackages(i).call();
+                packages.push(result[1]); // Assuming the package name is at index 1
+            }
+			const dropdown = document.getElementById('packageDropdown');
+
+            // Clear existing options
+            dropdown.innerHTML = '';
+
+            // Add options from the packages array
+            packages.forEach(packageName => {
+                const option = document.createElement('option');
+                option.value = packageName;
+                option.text = packageName;
+                dropdown.add(option);
+            });
+
+            console.log(packages);
+
+            // Display the result on the page
+            displayManufacturedPackagesResult(packages);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function displayManufacturedPackagesResult(packages) {
+        const resultDiv = document.getElementById('manufacturedPackages');
+        resultDiv.innerHTML = `<strong>Manufactured Packages:</strong> ${packages.join(', ')}<br>`;
+    }
+
+
+
+       
+</script>
+
+</center>
+</body>
+</html>
+

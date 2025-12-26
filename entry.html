@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Three Input Example</title>
+</head>
+<body>
+    <label for="idField">ID:</label>
+    <input type="text" id="idField">
+    <label for="nameField">Name:</label>
+    <input type="text" id="nameField">
+    <label for="messageField">Message:</label>
+    <input type="text" id="messageField">
+    <button onclick="displayInputs()">Submit</button>
+    <div id="outputDiv"></div>
+    <script>
+
+function displayInputs() {
+    // Get the input field elements by their IDs
+    var idInput = document.getElementById("idField");
+    var nameInput = document.getElementById("nameField");
+    var messageInput = document.getElementById("messageField");
+
+    // Get the values entered by the user
+    var id = idInput.value;
+    var name = nameInput.value;
+    var message = messageInput.value;
+
+    // Display the inputs on the webpage
+    var outputElement = document.getElementById("outputDiv");
+    outputElement.innerHTML = "ID: " + id + "<br>" +
+                              "Name: " + name + "<br>" +
+                              "Message: " + message;
+}
+    </script>
+</body>
+</html>

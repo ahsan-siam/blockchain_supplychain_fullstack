@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Contract Interaction</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Supplier Contract Interaction</h1>
+
+        <div class="mb-4">
+            <h2>Add Supplier</h2>
+            <div class="mb-3">
+                <label for="supplierId" class="form-label">Supplier ID:</label>
+                <input type="number" class="form-control" id="supplierId">
+            </div>
+            <div class="mb-3">
+                <label for="packages" class="form-label">Packages (comma separated):</label>
+                <input type="text" class="form-control" id="packages">
+            </div>
+            <button class="btn btn-primary" onclick="addSupplier()">Add Supplier</button>
+        </div>
+
+  
+   
+    
+    <script>
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            window.web3 = new Web3(ethereum);
+            ethereum.enable(); // Request user permission
+        } else {
+            console.error('MetaMask not installed');
+        }
+
+        const web3 = window.web3;
+
+        // Replace with your actual contract address and ABI
+        const contractAddress = '0x758dcED0d0F75fe9EC021321b5bBb6C4A8F5b047';
+        const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplier_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packages",
+				"type": "string[]"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "findSupplierByPackage",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSupplies",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSuppliesById",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "suppliers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "supplier_id",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function addSupplier() {
+            const supplierId = document.getElementById('supplierId').value;
+            const packages = document.getElementById('packages').value.split(',');
+
+            try {
+                const accounts = await ethereum.request({ method: 'eth_accounts' });
+                const from = accounts[0];
+
+                await contract.methods.addSupplier(supplierId, packages)
+                    .send({ from: from });
+
+                alert('Supplier added successfully');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+    </script>
+</body>
+</html>

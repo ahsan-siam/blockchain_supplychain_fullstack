@@ -1,0 +1,237 @@
+<html>
+<head>
+    <title>CONNECTION TO METAMASK</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js">
+
+
+    </script>
+  
+</head>
+<body>
+	<center><button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+        <p id="accountArea"></p>
+        <button onclick="connectContract()">CONNECT TO CONTRACT</button> <br>
+        <p id="contractArea"></p>
+        <button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
+        <p id="dataArea"></p>
+    </center>
+
+    <script>
+        //1- connect metamask
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("accountArea").innerHTML = account;
+            }
+
+            
+        }
+
+        //2- connect to smart contract
+        const connectContract = async () => {
+            const ABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_message",
+				"type": "string"
+			}
+		],
+		"name": "addMessage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getMessage",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getTotalMessages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "messages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "message",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+            const Address = "0xfF931E34fDA2D90B8a928A4A67DBDF967f320Ea7";
+           
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract( ABI, Address); 
+            document.getElementById("contractArea").innerHTML = "connected to smart contract";
+        }
+
+        //3-read data from smart contract
+        const readContract = async () => {
+            const data = await window.contract.methods.getTotalMessages().call();
+            document.getElementById("dataArea").innerHTML = data;
+        }
+    </script>
+
+            <center>
+                <label for="idField">ID:</label>
+<input type="text" id="idField">
+
+<label for="nameField">Name:</label>
+<input type="text" id="nameField">
+
+<label for="messageField">Message:</label>
+<input type="text" id="messageField">
+
+<button onclick="displayInputs()">Submit</button>
+
+<div id="outputDiv"></div>
+            </center>
+
+
+<script>
+
+function displayInputs() {
+// Get the input field elements by their IDs
+var idInput = document.getElementById("idField");
+var nameInput = document.getElementById("nameField");
+var messageInput = document.getElementById("messageField");
+
+// Get the values entered by the user
+var id = idInput.value;
+var name = nameInput.value;
+var message = messageInput.value;
+
+
+
+
+
+// Display the inputs on the webpage
+var outputElement = document.getElementById("outputDiv");
+outputElement.innerHTML = "ID: " + id + "<br>" +
+                          "Name: " + name + "<br>" +
+                          "Message: " + message;
+
+                          const enter = `${id}, "${name}", "${message}"`;
+console.log(enter);
+
+
+           
+async function sendToContract() {
+    
+  try {
+    // Sending the transaction to the smart contract using 'send'
+    await window.contract.methods.addMessage(id,name,message).send({ from: "0xfF931E34fDA2D90B8a928A4A67DBDF967f320Ea7" });
+
+    // Transaction successful
+    console.log("Transaction successful!");
+  } catch (error) {
+    // Transaction failed
+    console.error("Error sending transaction:", error);
+  }
+}
+
+// Call the function to send data to the contract
+sendToContract();
+
+
+
+}
+
+
+</script>
+
+<button onclick="fetchMessage()"> FETCH</button>
+<div id="output">
+
+</div>
+<script> 
+function fetchMessage(){
+    const index = 3;
+window.contract.methods.getMessage(index).call()
+  .then(result => {
+    console.log("Message details:", result);
+    const outputElement = document.getElementById("output");
+    outputElement.innerHTML = "ID: " + result[0] + "<br>" +
+                            "Name: " + result[1] + "<br>" +
+                            "Message: " + result[2];
+
+                            
+  })
+  .catch(error => {
+    console.error("Error calling getMessage:", error);
+  });
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  
+  <style>
+    body {
+      background-image: url('b2.jpg'); /* Replace with your image path */
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #000000; /* Black background */
+      justify-content: center; /* Center items horizontally */
+    }
+
+    .navbar-brand, .navbar-nav .nav-link {
+      color: #ffffff; /* Navbar text color */
+    }
+
+    .navbar-nav .nav-link:hover {
+      text-decoration: underline; /* Underline on hover */
+    }
+
+    .container {
+      margin-top: 100px;
+    }
+
+    .lock-image {
+      width: 90px;
+      height: 60px;
+      display: block;
+      margin: 0 auto; /* Center the image */
+    }
+
+    .login-form {
+      background-color: azure;
+      padding: 20px;
+      border-radius: 15px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+   
+      <a  style="position: absolute;left: 60px;" class="navbar-brand" href="#">Login Page</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="/">Registration</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/ota">Tracking: OTA </a>
+          </li>
+        </ul>
+    
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-3 login-form">
+
+        <h3 class="text-center">Login</h3>
+        <form action="/login" method="post">
+
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+
+          <div class="form-group text-center">
+            <img class="lock-image" src="lock.gif" alt="Lock and Key">
+          </div>
+        
+          <button type="submit" class="btn btn-primary btn-block">Login</button>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (optional, but needed for some features) -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

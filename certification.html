@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=600, initial-scale=1.0">
+
+<title>Dynamic Input Fields</title>
+<style>
+     label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 80%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+</style>
+</head>
+<body>
+
+<h2>Supplier Information</h2>
+<form id="supplierForm" onsubmit="submitForm(event)">
+    <label for="user_id">ID:</label>
+    <input type="number" id="user_id" name="user_id" required>
+    
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    
+    <label for="type">Type:</label>
+    <select id="type" name="type" onchange="changeInputs()">
+        <option value="supplier">Supplier</option>
+        <option value="manufacturer">Manufacturer</option>
+        <option value="wholesaler">Wholesaler</option>
+        <option value="retailer">Retailer</option>
+    </select>
+    
+    <div id="licenseContainer">
+        <label for="license">License:</label>
+        <input type="text" id="license" >
+    </div>
+    
+    <div id="expiryContainer">
+        <label for="expiry_date">Expiry Date:</label>
+        <input type="date" id="expiry_date"  >
+    </div>
+    
+    <div id="manufacturingAddressContainer" style="display: none;">
+        <label for="manufacturing_address">Manufacturing Address:</label>
+        <input type="text" id="manufacturing_address" name="manufacturing_address">
+    </div>
+    
+    <div id="factoryContainer" style="display: none;">
+        <label for="factory">Factory:</label>
+        <input type="text" id="factory" name="factory">
+    </div>
+    
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function changeInputs() {
+    const type = document.getElementById("type").value;
+    if (type === "manufacturer") {
+        licenseContainer.style.display = "none";
+        expiryContainer.style.display = "none";
+        manufacturingAddressContainer.style.display = "block";
+        factoryContainer.style.display = "block";
+
+        // Clear supplier-specific fields if hidden
+        document.getElementById("license").value = "";
+        document.getElementById("expiry_date").value = "";
+    } else {
+        licenseContainer.style.display = "block";
+        expiryContainer.style.display = "block";
+        manufacturingAddressContainer.style.display = "none";
+        factoryContainer.style.display = "none";
+
+        // Clear manufacturer-specific fields if hidden
+        document.getElementById("manufacturing_address").value = "";
+        document.getElementById("factory").value = "";
+    }
+}
+
+function submitForm(event) {
+    event.preventDefault(); // Prevent the default form submission
+    
+    const user_id = document.getElementById("user_id").value;
+    const password = document.getElementById("password").value;
+    const name = document.getElementById("name").value;
+    const type = document.getElementById("type").value;
+    let formData = `ID: ${user_id}, Password: ${password}, Name: ${name}, Type: ${type}`;
+        console.log(user_id);
+    fetch('/verify_cred', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id,
+        password
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Response from server:', data);
+      // Handle the response as needed
+      if (data.msg === "true") {
+        console.log('true');
+       
+
+
+             if (type === "supplier") {
+             const license = document.getElementById("license").value;
+             const expiry_date = document.getElementById("expiry_date").value;
+             console.log(license);
+
+             const requestBody = {
+  supplierId: user_id, // Assuming user_id is defined elsewhere
+  name: name, // Assuming name is defined elsewhere
+  license: license,
+  expiryDate: expiry_date
+};
+
+// Make an HTTP POST request to your server
+fetch('/addSupplierToDB', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(requestBody)
+})
+.then(response => {
+  if (response.ok) {
+    return response.json(); // Parse the JSON response
+  }
+  throw new Error('Network response was not ok.');
+})
+.then(data => {
+  console.log('Response from server:');
+  console.log('message:', data.message); // Log the 'message' property
+  console.log('someOtherProperty:', data.someOtherProperty); // Log other properties as needed
+
+  if (data.message === "Duplicate Entry") {
+    alert("Information Already Exists! \n Wait until  Verification is completed"); // Show an alert for duplicate entry
+  } else {
+    console.log('Server response:', data); // Log the entire response object
+    // Handle other responses or actions as needed
+  }
+})
+.catch(error => {
+  console.error('Error:', error); // Log any errors
+});
+
+
+
+
+
+
+
+
+
+                 } 
+            if (type === "manufacturer") {
+             const manufacturing_address = document.getElementById("manufacturing_address").value;
+              const factory = document.getElementById("factory").value;
+              console.log(factory);
+
+              
+
+
+              const requestBody = {
+                        id: user_id,
+                        m_name: name,
+                        adrDB: manufacturing_address,
+                        ceo: factory
+                                };
+
+                                fetch('/addMan', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(requestBody)
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        return response.json(); // Parse the JSON response
+                                    }
+                                    throw new Error('Network response was not ok.');
+                                })
+                                 .then(data => {
+                                                console.log('Response from server:');
+                                                console.log('message:', data.message); // Log the 'message' property
+                                                console.log('someOtherProperty:', data.someOtherProperty); // Log other properties as needed
+
+                                                if (data.message === "Duplicate Entry") {
+                                                    alert("Information Already Exists! \n Wait until  Verification is completed"); // Show an alert for duplicate entry
+                                                } else {
+                                                    console.log('Server response:', data); // Log the entire response object
+                                                    // Handle other responses or actions as needed
+                                                }
+                                                })
+                                .catch(error => {
+                                    console.error('Error:', error); 
+                                });
+
+
+
+
+
+
+
+
+             }
+             if (type === "wholesaler") {
+            const license = document.getElementById("license").value;
+            const expiry_date = document.getElementById("expiry_date").value;
+
+
+
+            const requestBody = {
+                        id: user_id,
+                        u_name: name,
+                        trade_license: license,
+                        date: expiry_date
+                                };
+
+                                // Make an HTTP POST request to your server
+                                fetch('/addWh', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(requestBody)
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        return response.json(); // Parse the JSON response
+                                    }
+                                    throw new Error('Network response was not ok.');
+                                })
+                                .then(data => {
+                                    console.log('Response from server:');
+                                                console.log('message:', data.message); // Log the 'message' property
+                                                console.log('someOtherProperty:', data.someOtherProperty); // Log other properties as needed
+
+                                                if (data.message === "Duplicate Entry") {
+                                                    alert("Information Already Exists! \n Wait until  Verification is completed"); // Show an alert for duplicate entry
+                                                } else {
+                                                    console.log('Server response:', data); // Log the entire response object
+                                                    // Handle other responses or actions as needed
+                                                } 
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error); // Log any errors
+                                });
+
+
+
+
+
+
+
+
+
+
+
+             } 
+              if (type === "retailer") {
+             const license = document.getElementById("license").value;
+             const expiry_date = document.getElementById("expiry_date").value;
+
+
+
+
+             const requestBody = {
+                        id: user_id,
+                        u_name: name,
+                        trade_license: license,
+                        date: expiry_date
+                                };
+
+                                // Make an HTTP POST request to your server
+                                fetch('/addRt', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(requestBody)
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        return response.json();
+                                    }
+                                    throw new Error('Network response was not ok.');
+                                })
+                                .then(data => {
+                                    console.log('Response from server:');
+                                                console.log('message:', data.message); // Log the 'message' property
+                                                console.log('someOtherProperty:', data.someOtherProperty); // Log other properties as needed
+
+                                                if (data.message === "Duplicate Entry") {
+                                                    alert("Information Already Exists! \n Wait until  Verification is completed"); // Show an alert for duplicate entry
+                                                } else {
+                                                    console.log('Server response:', data); // Log the entire response object
+                                                    // Handle other responses or actions as needed
+                                                } 
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error); // Log any errors
+                                });
+
+
+
+
+
+
+
+                 } 
+    
+
+
+
+
+
+
+      } else {
+        // Handle failed login (show error message, etc.)
+        alert('Invalid credentials. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error sending data to server:', error);
+      // Handle errors
+    });
+
+    
+
+    if (type === "supplier") {
+        const license = document.getElementById("license").value;
+        const expiry_date = document.getElementById("expiry_date").value;
+    } 
+    if (type === "manufacturer") {
+        const manufacturing_address = document.getElementById("manufacturing_address").value;
+        const factory = document.getElementById("factory").value;
+    }
+    if (type === "wholesaler") {
+        const license = document.getElementById("license").value;
+        const expiry_date = document.getElementById("expiry_date").value;
+    } 
+    if (type === "retailer") {
+        const license = document.getElementById("license").value;
+        const expiry_date = document.getElementById("expiry_date").value;
+    } 
+    
+    
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,3 @@
+let web3= new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
+
+web3.eth.getBalance("0x2A254e7aC8012DcD35b927845099CD49947E28C0");

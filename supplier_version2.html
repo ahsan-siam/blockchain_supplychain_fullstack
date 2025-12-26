@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Contract Interaction</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+
+
+    <style>
+        body {
+            background-image: url('b1.jpg'); /* Replace 'path/to/your/background-image.jpg' with your actual image path */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif; /* Optional: Setting a font-family for the entire page */
+            color: #333; /* Optional: Setting text color */
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* Optional: Adding a semi-transparent white background to the container */
+            padding: 20px;
+        border-radius: 10px;
+        margin-top: 50px;
+        max-width: 800px; /* Adjust the width as per your requirement */
+        margin-left: auto;
+        margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Supplier Contract Interaction</h1>
+
+        <div class="mb-4">
+            <h2>Add Supply</h2>
+            <div class="mb-2">
+                <label for="supplierId" class="form-label">Supplier ID:</label>
+                <input type="number" class="form-control" id="supplierId">
+            </div>
+            <div class="mb-3">
+                <label for="packages" class="form-label">Packages (comma separated):</label>
+                <input type="text" class="form-control" id="packages">
+            </div>
+            <button class="btn btn-primary" onclick="addSupplier()">Add Supply</button>
+        </div>
+
+        <div class="mb-4">
+            <h2>Get Supplier Details</h2>
+            <div class="mb-3">
+                <label for="supplierIndex" class="form-label">Supplier Index:</label>
+                <input type="number" class="form-control" id="supplierIndex">
+            </div>
+            <button class="btn btn-primary" onclick="getSupplier()">Get Supplier</button>
+        </div>
+
+        <div class="mb-4">
+            <h2>Find Suppliers by Package</h2>
+            <div class="mb-3">
+                <label for="searchPackage" class="form-label">Package Name:</label>
+                <input type="text" class="form-control" id="searchPackage">
+            </div>
+            <button class="btn btn-primary" onclick="findSuppliersByPackage()">Search</button>
+            <p id="suppliersByPackage" class="mt-3"></p>
+        </div>
+
+        <div class="mb-4">
+            <h2>Get Supplies by Supplier ID</h2>
+            <div class="mb-3">
+                <label for="supplierIdSupplies" class="form-label">Supplier ID:</label>
+                <input type="number" class="form-control" id="supplierIdSupplies">
+            </div>
+            <button class="btn btn-primary" onclick="getSuppliesById()">Get Supplies</button>
+            <p id="suppliesById" class="mt-3"></p>
+        </div>
+
+        <div class="mb-4">
+            <h2>Get All Supplies</h2>
+            <button class="btn btn-primary" onclick="getAllSupplies()">Get All Supplies</button>
+            <p id="allSupplies" class="mt-3"></p>
+        </div>
+		
+	
+
+    <script>
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            window.web3 = new Web3(ethereum);
+            ethereum.enable(); // Request user permission
+        } else {
+            console.error('MetaMask not installed');
+        }
+
+        const web3 = window.web3;
+
+        // Replace with your actual contract address and ABI
+        const contractAddress = '0xb5D75Be9b6626c25be43fCb18CE050E2bDC48dF5';
+        const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplier_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packages",
+				"type": "string[]"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "findSupplierByPackage",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSupplies",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "suppliers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "supplier_id",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function addSupplier() {
+            const supplierId = document.getElementById('supplierId').value;
+            const packages = document.getElementById('packages').value.split(',');
+
+            try {
+                const accounts = await ethereum.request({ method: 'eth_accounts' });
+                const from =  "0xa1Fa3f7A6c1E0dC048960845683daB81462919Df"//accounts[0];
+
+                await contract.methods.addSupplier(supplierId, packages)
+                    .send({ from: from });
+
+                alert('Supplier added successfully');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function getSupplier() {
+            const supplierIndex = document.getElementById('supplierIndex').value;
+
+            try {
+                const result = await contract.methods.getSupplier(supplierIndex).call();
+                alert(`Supplier ID: ${result[0]}\nPackages: ${result[1].join(', ')}`);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function findSuppliersByPackage() {
+            const searchPackage = document.getElementById('searchPackage').value;
+
+            try {
+                const result = await contract.methods.findSupplierByPackage(searchPackage).call();
+                document.getElementById('suppliersByPackage').innerText = result.join(', ');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function getSuppliesById() {
+            const supplierIdSupplies = document.getElementById('supplierIdSupplies').value;
+
+            try {
+                const result = await contract.methods.getSuppliesById(supplierIdSupplies).call();
+                document.getElementById('suppliesById').innerText = result.join(', ');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function getAllSupplies() {
+            try {
+                const result = await contract.methods.getAllSupplies().call();
+                const supplierIds = result[0].join(', ');
+                const allSupplies = result[1].join(', ');
+                document.getElementById('allSupplies').innerText = `Supplier IDs: ${supplierIds}\nAll Supplies: ${allSupplies}`;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+		async function addSuppliertoDB() {
+    const supplierId = getUserIdFromUrl();
+    const name = document.getElementById('name').value;
+    const license = document.getElementById('license').value;
+    const expiryDate = document.getElementById('expiryDate').value;
+
+    try {
+        
+
+        // Call the server endpoint to add the supplier details to the database
+        await fetch('/addSupplierToDB', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ supplierId,name, license, expiryDate }),
+        });
+
+        alert('Supplier added successfully');
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+
+
+
+
+function getUserIdFromUrl() {
+    const url = window.location.href;
+
+    const queryString = url.split('?')[1];
+
+    const params = new URLSearchParams(queryString);
+    const userId = params.get('userId');
+
+    return userId;
+}
+
+
+
+
+
+    </script>
+</body>
+</html>

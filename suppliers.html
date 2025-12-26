@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+
+ 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers Contract Interaction</title>
+   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>SUPPLIERS INTERFACE</h1>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">ADD SUPPLY </h5>
+                        <form id="addSupplierForm">
+                            <label for="supplierId">Supplier ID:</label>
+                            <input type="number" id="supplierId" required>
+                            <br>
+                            <label for="package">Package:</label>
+                            <input type="text" id="package" required>
+                            <br>
+                            <button  type="button" class="btn btn-success" onclick="addSupplier()">Add Supplier</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Interaction with the Blockchain</h5>
+                        
+    <br>
+    <button type="button" onclick="getSupplierCount()">Get Supplier Count</button>
+    <br>
+    
+    <form id="getSupplierByIdForm">
+        <label for="getIndex">Get Supplier by Index:</label>
+        <input type="number" id="getIndex" required>
+        <br>
+        <button type="button" onclick="getSupplierById()">Get Supplier by Index</button>
+    </form>
+    <br>
+    <form id="getSupplierIndexesForm">
+        <label for="getIndexesSupplierId">Get Supplier Indexes by Supplier ID:</label>
+        <input type="number" id="getIndexesSupplierId" required>
+        <br>
+        <button type="button" onclick="getSupplierIndexes()">Get Supplier Indexes</button>
+    </form>
+    <br>
+   
+    <h1>Suppliers Information</h1>
+    <button onclick="getAllSuppliers()">Show All Suppliers</button>
+    
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">OUTPUT BOX</h5>
+                        <div id="output"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-body">
+						
+						<!-- ... (existing HTML code) -->
+	
+							<center>
+								<h5 class="card-title">ADD NEW SUPPLIER TO THE DATABASE </h5>
+								<form id="addSupplierToDBForm">
+									<label for="supplierId">Supplier ID:</label>
+									<input type="number" id="supplierIdDB" required>
+									<br>
+									<label for="packageDB">Package:</label>
+									<input type="text" id="packageDB" required>
+									<br>
+									<label for="licenseDB">License:</label>
+									<input type="text" id="licenseDB" required>
+									<br>
+									<br>
+									<label for="expiryDB">License:</label>
+									<input type="date" id="expiryDB" required>
+									<br>
+									<button type="button" class="btn btn-success" onclick="addSupplierToDB()">Add Supplier to Database</button>
+								</form>
+							</center>
+	
+	<!-- ... (existing HTML code) -->
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+    
+	
+
+
+
+
+
+
+
+<!-- Inside your suppliers.html file -->
+
+
+
+<script>
+function addSupplierToDB() {
+    var supplierIdDB = document.getElementById("supplierIdDB").value;
+    var packageDB = document.getElementById("packageDB").value;
+	var licenseDB = document.getElementById("licenseDB").value;
+	var expiryDB = document.getElementById("expiryDB").value;
+
+    // Make an AJAX request to add the supplier to the database
+    fetch('/addSupplierToDB', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ supplierId: supplierIdDB, 
+			package: packageDB,license: licenseDB,expiry: expiryDB }),
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+
+<!-- ... (existing HTML code) -->
+
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.3.6/dist/web3.min.js"></script>
+<script>
+
+window.onload = function() {
+    if (typeof web3 !== 'undefined') {
+        window.web3 = new Web3(web3.currentProvider);
+    } else {
+        console.error("No web3 provider found. Please install MetaMask or use a browser with Ethereum support.");
+    }
+};
+
+function addSupplier() {
+    var contractAddress = "0xFbdcAd9446Cdcf24cB49Cb24e282a199efE2c115"; // Replace with your actual contract address
+    var contractABI =[
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_id",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_package",
+                    "type": "string"
+                }
+            ],
+            "name": "addSupplier",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_index",
+                    "type": "uint256"
+                }
+            ],
+            "name": "getSupplierById",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getSupplierCount",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_supplierId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "getSupplierIndexesById",
+            "outputs": [
+                {
+                    "internalType": "uint256[]",
+                    "name": "",
+                    "type": "uint256[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "supplierArray",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "id",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "string",
+                    "name": "package",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]; // Replace with your actual contract ABI
+
+    var suppliersContract = new web3.eth.Contract(contractABI, contractAddress);
+
+    var supplierId = document.getElementById("supplierId").value;
+    var package = document.getElementById("package").value;
+
+    // Get the selected account from MetaMask (or another provider)
+    web3.eth.getAccounts()
+        .then(function(accounts) {
+            var fromAddress = accounts[0];
+
+            suppliersContract.methods.addSupplier(supplierId, package).send({ from: fromAddress })
+                .on('receipt', function(receipt) {
+                    console.log(receipt);
+                    alert("Supplier added successfully!");
+                })
+                .on('error', function(error) {
+                    console.error(error);
+                    alert("Error adding supplier. Check the console for details.");
+                });
+        })
+        .catch(function(error) {
+            console.error(error);
+            alert("Error getting accounts. Check the console for details.");
+        });
+}
+
+async function getAllSuppliers() {
+    try {
+        var contractAddress = "0xFbdcAd9446Cdcf24cB49Cb24e282a199efE2c115"; // Replace with your actual contract address
+        var contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSuppliers",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierById",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierIndexesById",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "supplierArray",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "package",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Replace with your actual contract ABI
+
+        var suppliersContract = new web3.eth.Contract(contractABI, contractAddress);
+
+        // Call the getAllSuppliers function from the contract
+        const result = await suppliersContract.methods.getAllSuppliers().call();
+
+        // Display the result on the webpage
+        displaySuppliers(result);
+    } catch (error) {
+        console.error(error);
+        alert("Error fetching suppliers. Check the console for details.");
+    }
+}
+
+function displaySuppliers(result) {
+    var outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = ""; // Clear previous content
+
+    var ids = result[0];
+    var packages = result[1];
+
+    for (var i = 0; i < ids.length; i++) {
+        var supplierInfo = "Supplier ID: " + ids[i] + ", Package: " + packages[i];
+        var paragraph = document.createElement("p");
+        paragraph.textContent = supplierInfo;
+        outputDiv.appendChild(paragraph);
+    }
+}
+
+function getSupplierCount() {
+    var contractAddress = "0xFbdcAd9446Cdcf24cB49Cb24e282a199efE2c115"; // Replace with your actual contract address
+    var contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSuppliers",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierById",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierIndexesById",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "supplierArray",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "package",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Replace with your actual contract ABI
+
+    var suppliersContract = new web3.eth.Contract(contractABI, contractAddress);
+
+    suppliersContract.methods.getSupplierCount().call()
+        .then(function(result) {
+            console.log(result);
+            document.getElementById("output").innerHTML = "Supplier count: " + result;
+        })
+        .catch(function(error) {
+            console.error(error);
+            document.getElementById("output").innerHTML = "Error fetching supplier count. Check the console for details.";
+        });
+}
+
+function getSupplierById() {
+    var contractAddress = "0xFbdcAd9446Cdcf24cB49Cb24e282a199efE2c115"; // Replace with your actual contract address
+    var contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSuppliers",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierById",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierIndexesById",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "supplierArray",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "package",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Replace with your actual contract ABI
+
+    var suppliersContract = new web3.eth.Contract(contractABI, contractAddress);
+
+    var getIndex = document.getElementById("getIndex").value;
+
+    suppliersContract.methods.getSupplierById(getIndex).call()
+        .then(function(result) {
+            console.log(result);
+            document.getElementById("output").innerHTML = "Supplier ID: " + result[0] + ", Package: " + result[1];
+        })
+        .catch(function(error) {
+            console.error(error);
+            document.getElementById("output").innerHTML = "Error fetching supplier details. Check the console for details.";
+        });
+}
+
+function getSupplierIndexes() {
+    var contractAddress = "0xFbdcAd9446Cdcf24cB49Cb24e282a199efE2c115"; // Replace with your actual contract address
+    var contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSuppliers",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierById",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplierIndexesById",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "supplierArray",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "package",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Replace with your actual contract ABI
+
+    var suppliersContract = new web3.eth.Contract(contractABI, contractAddress);
+
+    var getIndexesSupplierId = document.getElementById("getIndexesSupplierId").value;
+
+    suppliersContract.methods.getSupplierIndexesById(getIndexesSupplierId).call()
+        .then(function(result) {
+            console.log(result);
+            document.getElementById("output").innerHTML = "Indexes: " + result.join(", ");
+        })
+        .catch(function(error) {
+            console.error(error);
+            document.getElementById("output").innerHTML = "Error fetching indexes. Check the console for details.";
+        });
+}
+  
+
+</script>

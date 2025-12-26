@@ -1,0 +1,369 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract Interaction</title>
+</head>
+<body>
+    <h1>Smart Contract Interaction</h1>
+
+    <h2>Insert Data</h2>
+    <form onsubmit="postPackage(event)">
+        <label for="manufacturerIdInput">Manufacturer ID:</label>
+        <input type="number" id="manufacturerIdInput" required />
+
+        <label for="packageIdInput">Package ID:</label>
+        <input type="text" id="packageIdInput" required />
+
+        <button type="submit">Post Package</button>
+    </form>
+
+    <hr />
+
+    <h2>Fetch Data</h2>
+    <form onsubmit="getPackage(event)">
+        <label for="getPackageIdInput">Package ID:</label>
+        <input type="text" id="getPackageIdInput" required />
+
+        <button type="submit">Get Package</button>
+    </form>
+
+    <hr />
+
+    <h2>Fetch Package by Index</h2>
+    <form onsubmit="getPackageByIndex(event)">
+        <label for="packageIndexInput">Package Index:</label>
+        <input type="number" id="packageIndexInput" required />
+
+        <button type="submit">Get Package by Index</button>
+    </form>
+
+    <hr />
+
+    <h2>Fetch Package Indices by Manufacturer ID</h2>
+    <form onsubmit="getPackageIndicesByManufacturerId(event)">
+        <label for="packageIndicesManufacturerIdInput">Manufacturer ID:</label>
+        <input type="number" id="packageIndicesManufacturerIdInput" required />
+
+        <button type="submit">Get Package Indices</button>
+    </form>
+
+    <hr />
+
+    <h2>Get Total Manufactured Packages Count</h2>
+    <button onclick="getManufacturedPackagesCount()">Get Total Packages Count</button>
+
+    <!-- Container to display package information -->
+    <div id="packageInfoContainer"></div>
+
+
+    <form id="addMan">
+      
+      <input type="text" id="addr" placeholder="Address">
+      <input type="text" id="manuf_name" placeholder="Manufactured" >
+      <input type="text" id="ceo" placeholder="CEO Name"> 
+	  <button type="button" class="btn btn-success" 
+	  onclick="addMan()">Add Supplier to Database</button>
+								
+    </form>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    
+</body>
+</html>
+<script>  
+
+function addMan() {
+    var addressDB = document.getElementById("addr").value;
+	var manuf_nameDB = document.getElementById("manuf_name").value;
+	var ceoDB = document.getElementById("ceo").value;
+
+    // Make an AJAX request to add the supplier to the database
+    fetch('/addMan', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ adrDB: addressDB, 
+			m_name: manuf_nameDB,ceo: ceoDB, }),
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+// app.js
+document.addEventListener('DOMContentLoaded', async () => {
+    // Connect to Ganache (change the provider URL if your Ganache is running on a different port)
+    const web3 = new Web3('http://127.0.0.1:7545');
+
+    // Smart Contract Address (replace with your deployed contract address)
+    const contractAddress = '0x5D9d9874EFBBbBb5F77c6171bF01A35a72EF2d4a';
+
+    // Smart Contract ABI (replace with your contract's ABI)
+    const contractAbi = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PackagePosted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "postManufacturedPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getManufacturedPackagesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "getPackageByPackageId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackageIndicesByManufacturerId",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "manufacturedPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manufacturer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    // Initialize the contract
+    const postManufacturedContract = new web3.eth.Contract(contractAbi, contractAddress);
+
+    // Insert Data (Post Package) Function
+    window.postPackage = async (event) => {
+        event.preventDefault();
+
+        const manufacturerId = document.getElementById('manufacturerIdInput').value;
+        const packageId = document.getElementById('packageIdInput').value;
+
+        // Use MetaMask to sign the transaction
+        const accounts = await web3.eth.getAccounts();
+        await postManufacturedContract.methods.postManufacturedPackage(manufacturerId, packageId)
+            .send({ from: accounts[0], gas: 200000 });
+
+        console.log('Package posted successfully.');
+    };
+
+    // Fetch Data (Get Package) Function
+    window.getPackage = async (event) => {
+        event.preventDefault();
+
+        const packageId = document.getElementById('getPackageIdInput').value;
+        try {
+            const result = await postManufacturedContract.methods.getPackageByPackageId(packageId).call();
+
+            // Display package information on the webpage
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `
+                <h3>Package Information</h3>
+                <p><strong>Manufacturer ID:</strong> ${result[0]}</p>
+                <p><strong>Package ID:</strong> ${result[1]}</p>
+                <p><strong>Timestamp:</strong> ${new Date(result[2] * 1000).toLocaleString()}</p>
+            `;
+        } catch (error) {
+            console.error('Error fetching package:', error.message);
+        }
+    };
+
+   
+
+    // Fetch Package Indices by Manufacturer ID Function
+    window.getPackageIndicesByManufacturerId = async (event) => {
+        event.preventDefault();
+
+        const manufacturerId = document.getElementById('packageIndicesManufacturerIdInput').value;
+        try {
+            const packageIndices = await postManufacturedContract.methods.getPackageIndicesByManufacturerId(manufacturerId).call();
+
+            // Display package indices on the webpage
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `<h3>Package Indices</h3>`;
+            packageInfoContainer.innerHTML += `<p><strong>Indices:</strong> ${packageIndices.join(', ')}</p>`;
+        } catch (error) {
+            console.error('Error fetching package indices:', error.message);
+        }
+    };
+
+
+    window.getPackageByIndex = async (event) => {
+        event.preventDefault();
+
+        const packageIndex = document.getElementById('packageIndexInput').value;
+        try {
+            const result = await postManufacturedContract.methods.manufacturedPackages(packageIndex).call();
+
+            // Display package information on the webpage
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `
+                <h3>Package Information (Index: ${packageIndex})</h3>
+                <p><strong>Manufacturer ID:</strong> ${result[0]}</p>
+                <p><strong>Package ID:</strong> ${result[1]}</p>
+                <p><strong>Timestamp:</strong> ${new Date(result[2] * 1000).toLocaleString()}</p>
+            `;
+        } catch (error) {
+            console.error('Error fetching package by index:', error.message);
+        }
+    };
+
+
+
+
+
+
+    
+    // Get Total Manufactured Packages Count Function
+    window.getManufacturedPackagesCount = async () => {
+        try {
+            const count = await postManufacturedContract.methods.getManufacturedPackagesCount().call();
+
+            // Display total count on the webpage
+            const packageInfoContainer = document.getElementById('packageInfoContainer');
+            packageInfoContainer.innerHTML = `<h3>Total Manufactured Packages Count</h3>`;
+            packageInfoContainer.innerHTML += `<p><strong>Count:</strong> ${count}</p>`;
+        } catch (error) {
+            console.error('Error fetching total count:', error.message);
+        }
+    };
+    
+});
+
+</script>

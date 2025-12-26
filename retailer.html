@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retailer Registry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Retailer Registry</h1>
+        <form id="registerForm">
+            <label for="name">Retailer Name:</label>
+            <input type="text" id="name" name="name">
+            <label for="package">Package Information:</label>
+            <input type="text" id="package" name="package">
+            <button type="button" onclick="registerRetailer()">Register Retailer</button>
+        </form>
+
+        <form id="searchForm">
+            <h2>Search Retailer</h2>
+            <label for="searchByName">Search by Retailer Name:</label>
+            <input type="text" id="searchByName" name="searchByName">
+            <button type="button" onclick="searchRetailerByName()">Search</button>
+
+            <label for="searchByPackage">Search by Package Information:</label>
+            <input type="text" id="searchByPackage" name="searchByPackage">
+            <button type="button" onclick="searchRetailerByPackage()">Search</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script>
+        const contractAddress = '0xF667fB5B919f9247F55E5f99d3653EBeeBec1969';
+        const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "registerRetailer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "RetailerRegistered",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "getRetailerByName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "getRetailerByPackageInfo",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+        const web3 = new Web3('HTTP://127.0.0.1:7545'); // Assuming Ganache is running on this port
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function registerRetailer() {
+    const name = document.getElementById('name').value;
+    const packageInfo = document.getElementById('package').value;
+
+    try {
+        const accounts = await web3.eth.getAccounts();
+        const from = accounts[0];
+
+        const gasLimit = 300000; // Specify a higher gas limit here
+
+        await contract.methods.registerRetailer(name, packageInfo).send({ from: from, gas: gasLimit });
+        alert('Retailer registered successfully!');
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+
+        async function searchRetailerByName() {
+            const name = document.getElementById('searchByName').value;
+
+            try {
+                // Call the contract method to get retailer by name
+                const retailer = await contract.methods.getRetailerByName(name).call();
+                displayResult(retailer);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function searchRetailerByPackage() {
+            const packageInfo = document.getElementById('searchByPackage').value;
+
+            try {
+                // Call the contract method to get retailer by package info
+                const retailer = await contract.methods.getRetailerByPackageInfo(packageInfo).call();
+                displayResult(retailer);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function displayResult(retailer) {
+    const resultDiv = document.getElementById('result');
+    if (retailer[0]) {
+        resultDiv.innerHTML = `
+            <p>Retailer Name: ${retailer[0]}</p>
+            <p>Package Information: ${retailer[1]}</p>
+        `;
+    } else {
+        resultDiv.innerHTML = '<p>Retailer not found.</p>';
+    }
+}
+
+    </script>
+</body>
+</html>

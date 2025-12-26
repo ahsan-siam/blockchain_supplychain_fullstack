@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Contract Interaction</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+</head>
+<body>
+<center>
+
+
+
+    <h1>Supplier Contract Interaction</h1>
+
+    <div>
+        <label for="supplierId">Supplier ID:</label>
+        <input type="text" id="supplierIdInput">
+    </div>
+    
+    <div>
+        <label for="package">Package:</label>
+        <input type="text" id="packageInput">
+    </div>
+    
+    <button onclick="addSupplier()">Add Supplier</button>
+    
+    <div>
+        <label for="getCountIndex">Index for Get Supplier:</label>
+        <input type="text" id="getCountIndex">
+        <button onclick="getSupplierCount()">Get Supplier Count</button>
+    </div>
+    
+    <div>
+        <label for="getSupplierIndex">Index for Get Supplier:</label>
+        <input type="text" id="getSupplierIndex">
+        <button onclick="getSupplier()">Get Supplier</button>
+    </div>
+    
+    <div>
+        <label for="findPackage">Package for Find Supplier:</label>
+        <input type="text" id="findPackage">
+        <button onclick="findSupplierByPackage()">Find Supplier by Package</button>
+    </div>
+    
+    <div>
+        <label for="getSuppliesId">Supplier ID for Get Supplies:</label>
+        <input type="text" id="getSuppliesId">
+        <button onclick="getSuppliesById()">Get Supplies by ID</button>
+    </div>
+    
+    <div id="result"></div>
+    
+
+</center>
+<script>
+    const contractAddress = '0xa9D24f9e244E58297065428F5608407aDEE73096';
+    const contractAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplier_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packages",
+				"type": "string[]"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "findSupplierByPackage",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSuppliesById",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "suppliers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "supplier_id",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    const web3 = new Web3(Web3.givenProvider || 'http://localhost:8545');
+    const contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+    async function addSupplier() {
+        const supplierId = document.getElementById('supplierIdInput').value;
+        const package = document.getElementById('packageInput').value;
+
+        try {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+
+            const result = await contract.methods.addSupplier(supplierId, [package]).send({ from: account });
+            console.log(result);
+
+            displayResult(result);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function getSupplierCount() {
+        const index = document.getElementById('getCountIndex').value;
+
+        try {
+            const result = await contract.methods.getSupplierCount().call();
+            console.log(result);
+
+            displayResult(result, index);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function getSupplier() {
+        const index = document.getElementById('getSupplierIndex').value;
+
+        try {
+            const result = await contract.methods.getSupplier(index).call();
+            console.log(result);
+
+            displayResult(result, index);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function findSupplierByPackage() {
+        const package = document.getElementById('findPackage').value;
+
+        try {
+            const result = await contract.methods.findSupplierByPackage(package).call();
+            console.log(result);
+
+            displayResult(result, package);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function getSuppliesById() {
+        const supplierId = document.getElementById('getSuppliesId').value;
+
+        try {
+            const result = await contract.methods.getSuppliesById(supplierId).call();
+            console.log(result);
+
+            displayResult(result, supplierId);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function displayResult(result, input) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML += `<strong>Result for ${input}:</strong> ${JSON.stringify(result)}<br>`;
+    }
+</script>
+
+
+
+
+<center>
+    <h5 class="card-title">ADD NEW SUPPLIER TO THE DATABASE </h5>
+    <form id="addSupplierToDBForm">
+        
+        <br>
+        <label for="packageDB">Name:</label>
+        <input type="text" id="packageDB" required>
+        <br>
+        <label for="licenseDB">License:</label>
+        <input type="text" id="licenseDB" required>
+        <br>
+        <br>
+        <label for="expiryDB">License:</label>
+        <input type="date" id="expiryDB" required>
+        <br>
+        <button type="button" class="btn btn-success" onclick="addSupplierToDB()">Add Supplier to Database</button>
+    </form>
+</center>
+
+
+</body>
+</html>
+<script>
+    function addSupplierToDB() {
+        var supplierIdDB = document.getElementById("supplierIdDB").value;
+        var packageDB = document.getElementById("packageDB").value;
+        var licenseDB = document.getElementById("licenseDB").value;
+        var expiryDB = document.getElementById("expiryDB").value;
+    
+        // Make an AJAX request to add the supplier to the database
+        fetch('/addSupplierToDB', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ supplierId: supplierIdDB, 
+                package: packageDB,license: licenseDB,expiry: expiryDB }),
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    </script>

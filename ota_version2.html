@@ -1,0 +1,1309 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract Information</title>
+    <!-- Bootstrap CSS link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.19.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .form-control {
+            width: 80%;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            width: 80%;
+        }
+        #contractData {
+            width: 80%;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        #contractData p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OTA: ONE TOUCH AUTHENTICATION</h1>
+        <div>
+            <label for="userInput">Enter Data (Separated by '-'): </label>
+            <input type="text" class="form-control" id="userInput" placeholder="Enter text">
+            <button class="btn btn-primary" onclick="fetchContractData()">Fetch Data</button>
+        </div>
+        <div id="contractData"></div>
+        <div id="hashchain"></div>
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function callSmartContract(contractAddress, contractAbi, functionName, parameter) {
+            const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');
+            const contract = new web3.eth.Contract(contractAbi, contractAddress);
+    
+            try {
+                const result = await contract.methods[functionName](parameter).call();
+                return result;
+            } catch (error) {
+                console.error(error);
+                return null;
+            }
+        }
+    
+        async function fetchContractData() {
+            const userInput = document.getElementById('userInput').value;
+            const inputData = userInput.split('-');
+            const supplier = inputData[0];
+            const manufacturer = inputData[0] + "-" + inputData[1];
+            const wholesaler = inputData[0] + "-" + inputData[1] + "-" + inputData[2];
+            const retailer = inputData[0] + "-" + inputData[1] + "-" + inputData[2];
+    
+            const resultSupplier = await callSmartContract('0x21520A63315E3Dc94175793b45b0A20f3c025265', [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplier_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packages",
+				"type": "string[]"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "findSupplierByPackage",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSupplies",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSuppliesById",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "suppliers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "supplier_id",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+], 'findSupplierByPackage', supplier);
+    
+            const resultManufacturer = await callSmartContract('0x578aD209108f5ee12F88a6a102c5A94F3Dcd6174', [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PackagePosted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "postManufacturedPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getManufacturedPackagesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "getPackageByPackageId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackageIndicesByManufacturerId",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "manufacturedPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manufacturer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+], 'getPackageByPackageId', manufacturer);
+    
+            const resultWholesaler = await callSmartContract('0x687522238DfC0E0B3f0921963a49287A59786E34',  [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_wholesalerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packageNames",
+				"type": "string[]"
+			}
+		],
+		"name": "addPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "countPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_wholesalerName",
+				"type": "string"
+			}
+		],
+		"name": "findPackagesByWholesaler",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageName",
+				"type": "string"
+			}
+		],
+		"name": "findWholesalerByPackage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "packages",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "wholesalerName",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+], 'findWholesalerByPackage', wholesaler);
+    
+            const resultRetailer = await callSmartContract('0xFDE1983976fF9799AB2853707025560b73C70389', [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "registerRetailer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "RetailerRegistered",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "getRetailerByName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "getRetailerByPackageInfo",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+], 'getRetailerByPackageInfo', retailer);
+    
+    
+            const HashSupplier = await callSmartContract('0x1d32AF0284F254d1E786d6bFeb837d4F5590ca9e', [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplier_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packages",
+				"type": "string[]"
+			}
+		],
+		"name": "addSupplier",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "findSupplierByPackage",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllSupplies",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_package",
+				"type": "string"
+			}
+		],
+		"name": "getBlockAndTxHash",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getSupplier",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSupplierCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_supplierId",
+				"type": "uint256"
+			}
+		],
+		"name": "getSuppliesById",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "suppliers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "supplier_id",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+], 'getBlockAndTxHash', supplier);
+            //console.log(HashSupplier[0]);
+            //console.log(HashSupplier[1]);
+    
+            const HashManufacturer = await callSmartContract('0x5193B2dc77F5085771d255EE72782E4B52499d33',[
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PackagePosted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "getBlockAndTxHash",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getManufacturedPackagesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "getPackageByPackageId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackageIndicesByManufacturerId",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "manufacturedPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "packageId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manufacturer",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_manufacturerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageId",
+				"type": "string"
+			}
+		],
+		"name": "postManufacturedPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+], 'getBlockAndTxHash', manufacturer);
+    
+            const HashWholesaler = await callSmartContract('0xfd391e6F9eB4eaebb01ed0fCa7A9fdF1e479b84B', [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_wholesalerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_packageNames",
+				"type": "string[]"
+			}
+		],
+		"name": "addPackage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "countPackages",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_wholesalerName",
+				"type": "string"
+			}
+		],
+		"name": "findPackagesByWholesaler",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageName",
+				"type": "string"
+			}
+		],
+		"name": "findWholesalerByPackage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageName",
+				"type": "string"
+			}
+		],
+		"name": "getBlockAndTxHash",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getPackage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "packages",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "wholesalerName",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+], 'getBlockAndTxHash', wholesaler);
+console.log(HashManufacturer[0]);
+    
+            const HashRetailer = await callSmartContract('0xc3Be75D5390a97b32D4F890e8DaC7812BB5d95D1', [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "RetailerRegistered",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "getBlockAndTxHash",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "getRetailerByName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "getRetailerByPackageInfo",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_packageInfo",
+				"type": "string"
+			}
+		],
+		"name": "registerRetailer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+], 'getBlockAndTxHash', retailer);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+            displayResult(resultSupplier, resultManufacturer, resultWholesaler,resultRetailer,
+            HashSupplier,HashManufacturer,HashWholesaler,HashRetailer);
+        }
+    
+        function displayResult(resultSupplier, resultManufacturer, resultWholesaler,resultRetailer,
+            HashSupplier,HashManufacturer,HashWholesaler,HashRetailer) {
+				
+				const contractDataDiv = document.getElementById('contractData');
+            contractDataDiv.innerHTML = '';
+                // AA-BB-102
+            if (resultSupplier) {
+               // x(resultSupplier[0])
+
+
+			   
+                contractDataDiv.innerHTML += `<div style='margin-left:35px;height: 80px;width: 450px;border: 1px solid grey;'>
+                    <div><img src="sl.png" style='height: 50px;width: 50px;float:left;'></div>
+                <div style=' text-align: left;'> Supplier ${JSON.stringify(resultSupplier[0])}
+                  
+                    </div></div>`;
+					
+					fetchFromServer(resultManufacturer[0]) ;
+            } else {
+                contractDataDiv.innerHTML += `<p>Failed to fetch Supplier data</p>`;
+            }
+    
+            if (resultManufacturer) {
+                contractDataDiv.innerHTML += `<div style='margin-left:35px;height: 80px;width: 450px;border: 1px solid grey;''>
+                    <div><img src="ml.png" style='height: 50px;width: 50px;float:left;'></div>
+                <div> Manufactured <br>${new Date(resultManufacturer[2] * 1000).toLocaleString()}<br>
+                    ID : ${JSON.stringify(resultManufacturer[0])}
+					
+                    
+                    </div></div>`;
+					fetchFromServer(resultManufacturer[0]) ;
+					
+            } else {
+                contractDataDiv.innerHTML += `<p>Failed to fetch Manufacturer data</p>`;
+            }
+                /*
+                 Block : ${JSON.stringify(HashSupplier[0])}
+                     Hash : ${JSON.stringify(HashSupplier[1])}
+                Block : ${JSON.stringify(HashManufacturer[0])}
+                     Hash : ${JSON.stringify(HashManufacturer[1])}
+                Block : ${JSON.stringify(HashWholesaler[0])}
+                     Hash : ${JSON.stringify(HashWholesaler[1])}
+                
+                */
+            if (resultWholesaler) {
+                contractDataDiv.innerHTML += `<div style='margin-left:35px;height: 80px;width: 450px;border: 1px solid grey;''>
+                    <div><img src="wl.png" style='height: 50px;width: 50px;float:left;'></div>
+                <div> Wholesaler ${JSON.stringify(resultWholesaler)}
+                     
+                    </div></div>`;
+            } 
+			/*
+			else {
+                contractDataDiv.innerHTML += `<p>Failed to fetch Wholesaler data</p>`;
+            }
+			*/
+            if (resultRetailer) {
+                contractDataDiv.innerHTML += `<div style='margin-left:35px;height: 80px;width: 450px;border: 1px solid grey;''>
+                                                <div><img src="rl.png" style='height: 50px;width: 50px;float:left;'></div>
+                <div> Retailer ${JSON.stringify(resultRetailer[0])}</div>
+						
+                    </div>`;
+            } 
+			/*
+			else {
+                contractDataDiv.innerHTML += `<p>Failed to fetch Wholesaler data</p>`;
+            }
+			*/
+        }
+    
+    
+		function fetchFromServer(sup) {
+    fetch('/fetchSupplierInfo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: sup }), // Assuming you are sending the ID to fetch the name
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // assuming the response is JSON data
+    })
+    .then(data => {
+        console.log('Name received:', data.name.username);
+		return JSON.stringify(data.name.username);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+// Call the function to fetch data from the server
+
+    
+    </script>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
