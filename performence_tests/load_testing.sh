@@ -1,0 +1,1 @@
+ locust -f locust_script.py --host http://localhost:3000 --users 100 spawn-rate 20
